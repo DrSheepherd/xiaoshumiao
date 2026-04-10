@@ -8,29 +8,20 @@ import android.util.Log
 object LimitHelper {
     private const val TAG = "LimitHelper"
 
-    private val STREAMS = intArrayOf(
-        AudioManager.STREAM_VOICE_CALL,
-        AudioManager.STREAM_SYSTEM,
-        AudioManager.STREAM_RING,
-        AudioManager.STREAM_MUSIC,
-        AudioManager.STREAM_ALARM,
-        AudioManager.STREAM_NOTIFICATION,
-    )
-
-    fun clampAllVolumes(context: Context, maxVolumePct: Int) {
+    /** 仅限制媒体音量；铃声、通知、闹钟、通话等其它流不处理 */
+    fun clampMediaVolume(context: Context, maxVolumePct: Int) {
         val am = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         val pct = maxVolumePct.coerceIn(1, 100)
-        for (stream in STREAMS) {
-            try {
-                val max = am.getStreamMaxVolume(stream)
-                val cap = (max * (pct / 100f)).toInt().coerceIn(0, max)
-                val cur = am.getStreamVolume(stream)
-                if (cur > cap) {
-                    am.setStreamVolume(stream, cap, 0)
-                }
-            } catch (e: Exception) {
-                Log.w(TAG, "clamp volume stream=$stream", e)
+        val stream = AudioManager.STREAM_MUSIC
+        try {
+            val max = am.getStreamMaxVolume(stream)
+            val cap = (max * (pct / 100f)).toInt().coerceIn(0, max)
+            val cur = am.getStreamVolume(stream)
+            if (cur > cap) {
+                am.setStreamVolume(stream, cap, 0)
             }
+        } catch (e: Exception) {
+            Log.w(TAG, "clamp media volume", e)
         }
     }
 

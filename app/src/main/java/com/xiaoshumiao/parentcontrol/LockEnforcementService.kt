@@ -51,7 +51,7 @@ class LockEnforcementService : Service() {
     private fun applyLimitsNow() {
         val volPct = Prefs.getMaxVolumePct(this)
         val briPct = Prefs.getMaxBrightnessPct(this)
-        LimitHelper.clampAllVolumes(this, volPct)
+        LimitHelper.clampMediaVolume(this, volPct)
         LimitHelper.clampBrightness(this, briPct)
     }
 

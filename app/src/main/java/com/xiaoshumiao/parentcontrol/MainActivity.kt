@@ -64,7 +64,7 @@ class MainActivity : AppCompatActivity() {
             val v = Prefs.getMaxVolumePct(this)
             val b = Prefs.getMaxBrightnessPct(this)
             binding.textLockedHint.text =
-                "当前上限：最大音量 ${v}%，最大亮度 ${b}%。\n侧键调高若超过上限会自动压回上限；不超过则不变。"
+                "当前上限：最大媒体音量 ${v}%，最大亮度 ${b}%。\n媒体音量调高若超过上限会自动压回；铃声、通知、闹钟音量不受限制。"
         } else {
             binding.titleText.setText(R.string.title_unlocked)
             binding.panelUnlocked.visibility = android.view.View.VISIBLE
@@ -102,7 +102,7 @@ class MainActivity : AppCompatActivity() {
         }
         Prefs.setLocked(this, true)
         LockEnforcementService.start(this)
-        LimitHelper.clampAllVolumes(this, Prefs.getMaxVolumePct(this))
+        LimitHelper.clampMediaVolume(this, Prefs.getMaxVolumePct(this))
         LimitHelper.clampBrightness(this, Prefs.getMaxBrightnessPct(this))
         Toast.makeText(this, R.string.msg_lock_ok, Toast.LENGTH_SHORT).show()
         refreshUiState()
