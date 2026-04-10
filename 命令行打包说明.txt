@@ -1,0 +1,54 @@
+========================================
+不装 Android Studio，如何得到 APK
+========================================
+
+【方式一】GitHub 云端打包（推荐，本机几乎不用装环境）
+----------------------------------------
+1. 在 GitHub 新建一个仓库，把「小树苗」整个文件夹推上去。
+2. 打开仓库页 → Actions → 左侧选「Build Debug APK」→ Run workflow。
+3. 跑完后在运行记录最下方 Artifacts 里下载 app-debug.zip，解压即得 app-debug.apk。
+
+说明：仓库里已包含 .github/workflows/build-apk.yml，会自动安装 JDK、Android SDK 并执行打包。
+
+
+【方式二】本机命令行打包（需自行安装 JDK + Android SDK）
+----------------------------------------
+1) 安装 JDK 17（任选其一）
+   - macOS（Homebrew）：brew install temurin@17
+   - 或从 Adoptium 下载安装：https://adoptium.net/
+
+2) 安装 Android 命令行工具（不含 Android Studio）
+   - 打开：https://developer.android.com/studio#command-tools
+   - 下载 Command line tools only，解压到例如 ~/android-sdk/cmdline-tools/latest/
+
+3) 配置环境变量（路径按你实际解压位置改）
+   export ANDROID_HOME="$HOME/android-sdk"
+   export PATH="$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools"
+
+4) 安装编译所需组件
+   yes | sdkmanager --licenses
+   sdkmanager "platforms;android-34" "build-tools;34.0.0"
+
+5) 在项目根目录「小树苗」下生成 local.properties（sdk.dir 指向你的 SDK 根目录）
+   echo "sdk.dir=$HOME/android-sdk" > local.properties
+
+6) 下载 Gradle Wrapper 的 jar（项目里已带 gradlew 脚本，缺 jar 时执行）
+   bash scripts/bootstrap-gradle-wrapper.sh
+
+7) 打包 Debug APK
+   chmod +x gradlew
+   ./gradlew assembleDebug
+
+8) 生成的 APK 路径
+   app/build/outputs/apk/debug/app-debug.apk
+
+
+【方式三】请有 Android Studio 的同事/朋友代打
+----------------------------------------
+把项目文件夹拷给对方，用 Android Studio 打开 → Build → Build Bundle(s) / APK(s) → Build APK(s)。
+
+
+备注
+----------------------------------------
+- Debug APK 可直接安装测试；若需正式发布上架，还需配置 release 签名（另需 keytool 与签名配置）。
+- 若 ./gradlew 提示找不到 java，请先安装 JDK 17 并配置 JAVA_HOME。
