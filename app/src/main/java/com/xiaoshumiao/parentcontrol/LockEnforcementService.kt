@@ -10,7 +10,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.database.ContentObserver
-import android.media.AudioManager
 import android.net.Uri
 import android.os.Build
 import android.os.Handler
@@ -63,7 +62,7 @@ class LockEnforcementService : Service() {
                     applyLimitsNow()
                 }
             }
-            val filter = IntentFilter(AudioManager.VOLUME_CHANGED_ACTION)
+            val filter = IntentFilter("android.media.VOLUME_CHANGED_ACTION")
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 registerReceiver(volumeReceiver, filter, Context.RECEIVER_NOT_EXPORTED)
             } else {
@@ -86,14 +85,14 @@ class LockEnforcementService : Service() {
         volumeReceiver?.let {
             try {
                 unregisterReceiver(it)
-            } catch (_: Exception) {
+            } catch (ignored: Exception) {
             }
             volumeReceiver = null
         }
         brightnessObserver?.let {
             try {
                 contentResolver.unregisterContentObserver(it)
-            } catch (_: Exception) {
+            } catch (ignored: Exception) {
             }
             brightnessObserver = null
         }
